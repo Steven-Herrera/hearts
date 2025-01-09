@@ -53,16 +53,16 @@ class InputsSchema(Schema):
 
     padt
     Age: papd.Series[padt.UInt64] = pa.Field(ge=0)
-    Sex: papd.Series[str] = pa.Field(isin=['M', 'F'])
-    ChestPainType: papd.Series[str] = pa.Field(isin=['ATA' 'NAP' 'ASY' 'TA'])
+    Sex: papd.Series[str] = pa.Field(isin=["M", "F"])
+    ChestPainType: papd.Series[str] = pa.Field(isin=["ATA" "NAP" "ASY" "TA"])
     RestingBP: papd.Series[padt.UInt64] = pa.Field(gt=0)
-    Cholesterol: papd.Series[padt.UInt64] = pa.Field(ge=0)  
-    FastingBS: papd.Series[padt.UInt64] = pa.Field(isin=[0,1])
-    RestingECG: papd.Series[str] = pa.Field(isin=['Normal' 'ST' 'LVH'])
+    Cholesterol: papd.Series[padt.UInt64] = pa.Field(ge=0)
+    FastingBS: papd.Series[padt.UInt64] = pa.Field(isin=[0, 1])
+    RestingECG: papd.Series[str] = pa.Field(isin=["Normal" "ST" "LVH"])
     MaxHR: papd.Series[padt.UInt64] = pa.Field(gt=0, lt=220)
-    ExerciseAngina: papd.Series[str] = pa.Field(isin=['Y', 'N'])
+    ExerciseAngina: papd.Series[str] = pa.Field(isin=["Y", "N"])
     Oldpeak: papd.Series[padt.Float64] = pa.Field()
-    ST_Slope: papd.Series[str] = pa.Field(isin=['Up', 'Flat', 'Down'])
+    ST_Slope: papd.Series[str] = pa.Field(isin=["Up", "Flat", "Down"])
 
 
 Inputs = papd.DataFrame[InputsSchema]
@@ -71,7 +71,7 @@ Inputs = papd.DataFrame[InputsSchema]
 class TargetsSchema(Schema):
     """Schema for the project target."""
 
-    HeartDisease: papd.Series[padt.UInt64] = pa.Field(isin=[0,1])
+    HeartDisease: papd.Series[padt.UInt64] = pa.Field(isin=[0, 1])
 
 
 Targets = papd.DataFrame[TargetsSchema]
@@ -80,7 +80,7 @@ Targets = papd.DataFrame[TargetsSchema]
 class OutputsSchema(Schema):
     """Schema for the project output."""
 
-    prediction: papd.Series[padt.UInt32] = pa.Field(isin=[0,1])
+    prediction: papd.Series[padt.UInt32] = pa.Field(isin=[0, 1])
 
 
 Outputs = papd.DataFrame[OutputsSchema]

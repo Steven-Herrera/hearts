@@ -120,8 +120,8 @@ class BaselineSklearnXGBModel(Model):
     KIND: T.Literal["BaselineSklearnXGBModel"] = "BaselineSklearnXGBModel"
 
     # params
-    objective: str = 'binary:hinge'
-    device: str = 'cuda'
+    objective: str = "binary:hinge"
+    device: str = "cuda"
     verbosity: int = 2
     random_state: int | None = 42
     # private
@@ -136,20 +136,13 @@ class BaselineSklearnXGBModel(Model):
     _numerical_binary: list[str] = [
         "FastingBS",
     ]
-    _categoricals: list[str] = [
-    "Sex",
-    "ChestPainType",
-    'RestingECG',
-    'ExerciseAngina',
-    'ST_Slope'
-    ]
-
+    _categoricals: list[str] = ["Sex", "ChestPainType", "RestingECG", "ExerciseAngina", "ST_Slope"]
 
     @T.override
-    def fit(self, inputs: schemas.Inputs, targets: schemas.Targets) -> "BaselineSklearnModel":
+    def fit(self, inputs: schemas.Inputs, targets: schemas.Targets) -> "BaselineSklearnXGBModel":
         # subcomponents
         categoricals_transformer = preprocessing.OneHotEncoder(
-            sparse_output=False, handle_unknown="ignore", drop='if_binary'
+            sparse_output=False, handle_unknown="ignore", drop="if_binary"
         )
         numericals_transformer = preprocessing.Normalizer()
 
@@ -157,16 +150,18 @@ class BaselineSklearnXGBModel(Model):
         transformer = compose.ColumnTransformer(
             [
                 ("categoricals", categoricals_transformer, self._categoricals),
-                ('numericals', numericals_transformer, self._numericals)
-                ("numerical_binary", "passthrough", self._numerical_binary),
+                ("numericals", numericals_transformer, self._numericals)(
+                    "numerical_binary", "passthrough", self._numerical_binary
+                ),
             ],
             remainder="drop",
         )
-        clf = XGBClassifier(random_state=self.random_state
-                                     objective=self.objective,
-                                     device=self.device,
-                                     verbosity=self.verbosity
-                                )
+        clf = XGBClassifier(
+            random_state=self.random_state,
+            objective=self.objective,
+            device=self.device,
+            verbosity=self.verbosity,
+        )
         # pipeline
         self._pipeline = pipeline.Pipeline(
             steps=[

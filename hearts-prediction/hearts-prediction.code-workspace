@@ -5,6 +5,9 @@
 		}
 	],
 	"settings": {
+		"python.autoComplete.extraPaths": [
+			"./src"
+		],
 		"editor.formatOnSave": true,
 		"python.defaultInterpreterPath": ".venv/bin/python",
 		"python.testing.pytestEnabled": true,

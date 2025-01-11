@@ -1,8 +1,7 @@
 # %% IMPORTS
 
-import typing as T
-
 import pytest
+import typing_extensions as T
 
 from hearts_prediction.core import models, schemas
 
@@ -60,7 +59,14 @@ def test_baseline_sklearn_model(
     train_test_sets: tuple[schemas.Inputs, schemas.Targets, schemas.Inputs, schemas.Targets],
 ) -> None:
     # given
-    params = {"max_depth": 3, "n_estimators": 5, "random_state": 0}
+    params = {
+        "max_depth": 3,
+        "n_estimators": 5,
+        "random_state": 0,
+        "objective": "binary:hinge",
+        "device": "cuda",
+        "verbosity": 2,
+    }
     inputs_train, targets_train, inputs_test, _ = train_test_sets
     model = models.BaselineSklearnXGBModel().set_params(**params)
     # when

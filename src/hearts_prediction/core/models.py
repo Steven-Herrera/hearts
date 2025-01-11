@@ -3,10 +3,10 @@
 # %% IMPORTS
 
 import abc
-import typing as T
 
 import pydantic as pdt
 import shap
+import typing_extensions as T
 from sklearn import compose, pipeline, preprocessing
 from xgboost.sklearn import XGBClassifier
 
@@ -119,6 +119,8 @@ class BaselineSklearnXGBModel(Model):
     KIND: T.Literal["BaselineSklearnXGBModel"] = "BaselineSklearnXGBModel"
 
     # params
+    max_depth: int = 20
+    n_estimators: int = 200
     objective: str = "binary:hinge"
     device: str = "cuda"
     verbosity: int = 2
@@ -155,6 +157,8 @@ class BaselineSklearnXGBModel(Model):
             remainder="drop",
         )
         clf = XGBClassifier(
+            max_depth=self.max_depth,
+            n_estimators=self.n_estimators,
             random_state=self.random_state,
             objective=self.objective,
             device=self.device,

@@ -3,6 +3,7 @@
 # %% IMPORTS
 
 import os
+from pathlib import Path
 
 import omegaconf
 import pytest
@@ -72,13 +73,13 @@ def tmp_outputs_path(tmp_path: str) -> str:
 @pytest.fixture(scope="function")
 def tmp_models_explanations_path(tmp_path: str) -> str:
     """Return a tmp path for the model explanations dataset."""
-    return os.path.join(tmp_path, "models_explanations.parquet")
+    return os.path.join(tmp_path, "models_explanations.csv")
 
 
 @pytest.fixture(scope="function")
 def tmp_samples_explanations_path(tmp_path: str) -> str:
     """Return a tmp path for the samples explanations dataset."""
-    return os.path.join(tmp_path, "samples_explanations.parquet")
+    return os.path.join(tmp_path, "samples_explanations.csv")
 
 
 # %% - Configs
@@ -176,21 +177,21 @@ def inputs(inputs_reader: datasets.CSVReader) -> schemas.Inputs:
 
 
 @pytest.fixture(scope="session")
-def inputs_samples(inputs_samples_reader: datasets.ParquetReader) -> schemas.Inputs:
+def inputs_samples(inputs_samples_reader: datasets.CSVReader) -> schemas.Inputs:
     """Return the inputs samples data."""
     data = inputs_samples_reader.read()
     return schemas.InputsSchema.check(data)
 
 
 @pytest.fixture(scope="session")
-def targets(targets_reader: datasets.ParquetReader) -> schemas.Targets:
+def targets(targets_reader: datasets.CSVReader) -> schemas.Targets:
     """Return the targets data."""
     data = targets_reader.read()
     return schemas.TargetsSchema.check(data)
 
 
 @pytest.fixture(scope="session")
-def outputs(outputs_reader: datasets.ParquetReader) -> schemas.Outputs:
+def outputs(outputs_reader: datasets.CSVReader) -> schemas.Outputs:
     """Return the outputs data."""
     data = outputs_reader.read()
     return schemas.OutputsSchema.check(data)
@@ -314,9 +315,13 @@ def alerts_service() -> T.Generator[services.AlertsService, None, None]:
 @pytest.fixture(scope="function", autouse=True)
 def mlflow_service(tmp_path: str) -> T.Generator[services.MlflowService, None, None]:
     """Return and start the mlflow service."""
+    # Convert Windows path to a valid file:// URI
+    tracking_uri = Path(tmp_path, "tracking").resolve().as_uri()
+    registry_uri = Path(tmp_path, "registry").resolve().as_uri()
+
     service = services.MlflowService(
-        tracking_uri=f"{tmp_path}/tracking/",
-        registry_uri=f"{tmp_path}/registry/",
+        tracking_uri=tracking_uri,
+        registry_uri=registry_uri,
         experiment_name="Experiment-Testing",
         registry_name="Registry-Testing",
     )

@@ -6,7 +6,7 @@ from hearts_prediction.utils import searchers, splitters
 # %% SEARCHERS
 
 
-def test_grid_cv_searcher(
+def test_bayes_cv_searcher(
     model: models.Model,
     metric: metrics.Metric,
     inputs: schemas.Inputs,

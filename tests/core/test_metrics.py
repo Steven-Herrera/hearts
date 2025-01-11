@@ -59,7 +59,7 @@ def test_sklearn_metric(
 
 def test_threshold() -> None:
     # given
-    threshold = metrics.Threshold(threshold=10, greater_is_better=True)
+    threshold = metrics.Threshold(threshold=0.001, greater_is_better=True)
     # when
     mlflow_threshold = threshold.to_mlflow()
     # then

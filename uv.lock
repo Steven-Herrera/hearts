@@ -1063,6 +1063,7 @@ dependencies = [
     { name = "scikit-learn" },
     { name = "scikit-optimize" },
     { name = "shap" },
+    { name = "typing-extensions" },
     { name = "xgboost" },
 ]
 
@@ -1110,6 +1111,7 @@ requires-dist = [
     { name = "scikit-learn", specifier = "==1.5.2" },
     { name = "scikit-optimize", specifier = ">=0.10.2" },
     { name = "shap", specifier = ">=0.46.0" },
+    { name = "typing-extensions", specifier = ">=4.12.2" },
     { name = "xgboost", specifier = ">=2.1.3" },
 ]
 

@@ -3,11 +3,11 @@
 # %% IMPORTS
 
 import abc
-import typing as T
 
 import mlflow.data.pandas_dataset as lineage
 import pandas as pd
 import pydantic as pdt
+import typing_extensions as T
 
 # %% TYPINGS
 

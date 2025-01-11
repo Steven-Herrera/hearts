@@ -7,13 +7,13 @@ from __future__ import annotations
 import abc
 import contextlib as ctx
 import sys
-import typing as T
 import warnings
 
 import loguru
 import mlflow
 import mlflow.tracking as mt
 import pydantic as pdt
+import typing_extensions as T
 from plyer import notification
 
 # %% SERVICES

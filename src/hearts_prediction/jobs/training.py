@@ -2,10 +2,9 @@
 
 # %% IMPORTS
 
-import typing as T
-
 import mlflow
 import pydantic as pdt
+import typing_extensions as T
 
 from hearts_prediction.core import metrics as metrics_
 from hearts_prediction.core import models, schemas
@@ -42,9 +41,13 @@ class TrainingJob(base.Job):
     model: models.ModelKind = pdt.Field(models.BaselineSklearnXGBModel(), discriminator="KIND")
     # Metrics
     metrics: metrics_.MetricsKind = [
-        metrics_.SklearnMetric(),
-        metrics_.SklearnMetric(name="precision_score", greater_is_better=True, average="weighted"),
-        metrics_.SklearnMetric(name="recall_score", greater_is_better=True, average="weighted"),
+        metrics_.SklearnMetric(name="f1_score", kwargs={"average": "weighted"}),
+        metrics_.SklearnMetric(
+            name="precision_score", greater_is_better=True, kwargs={"average": "weighted"}
+        ),
+        metrics_.SklearnMetric(
+            name="recall_score", greater_is_better=True, kwargs={"average": "weighted"}
+        ),
     ]
     # Splitter
     splitter: splitters.SplitterKind = pdt.Field(
@@ -141,6 +144,4 @@ class TrainingJob(base.Job):
                 title="Training Job Finished",
                 message=f"Model version: {model_version.version}",
             )
-        return locals()
-        return locals()
         return locals()

@@ -5,11 +5,14 @@
 from __future__ import annotations
 
 import abc
-import typing as T
 
 import mlflow
+import mlflow.models
+import mlflow.models.evaluation
+import mlflow.models.evaluation.validation
 import pandas as pd
 import pydantic as pdt
+import typing_extensions as T
 from mlflow.metrics import MetricValue
 from sklearn import metrics as sklearn_metrics
 
@@ -113,7 +116,7 @@ class SklearnMetric(Metric):
 
     KIND: T.Literal["SklearnMetric"] = "SklearnMetric"
 
-    name: str = "f1_weighted"
+    name: str = "f1_score"
     greater_is_better: bool = True
     kwargs: dict = {}
 

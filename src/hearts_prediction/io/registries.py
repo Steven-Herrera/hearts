@@ -3,10 +3,12 @@
 # %% IMPORTS
 
 import abc
-import typing as T
 
 import mlflow
+import mlflow.entities
+import mlflow.entities.model_registry
 import pydantic as pdt
+import typing_extensions as T
 from mlflow.pyfunc import PyFuncModel, PythonModel, PythonModelContext
 
 from hearts_prediction.core import models, schemas

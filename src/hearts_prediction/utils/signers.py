@@ -3,10 +3,10 @@
 # %% IMPORTS
 
 import abc
-import typing as T
 
 import mlflow
 import pydantic as pdt
+import typing_extensions as T
 from mlflow.models import signature as ms
 
 from hearts_prediction.core import schemas

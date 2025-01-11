@@ -1,0 +1,14 @@
+job:
+  KIND: TuningJob
+  inputs:
+    KIND: CSVReader
+    path: "${tests_path:}/data/inputs_test.csv"
+    limit: 100
+  targets:
+    KIND: ParquetReader
+    path: "${tests_path:}/data/targets_test.csv"
+    limit: 100
+  splitter:
+    KIND: TrainTestSplitter
+    n_splits: 3
+    test_size: 0.2

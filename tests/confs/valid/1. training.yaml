@@ -1,0 +1,10 @@
+job:
+  KIND: TrainingJob
+  inputs:
+    KIND: CSVReader
+    path: "${tests_path:}/data/inputs_test.csv"
+    limit: 100
+  targets:
+    KIND: CSVReader
+    path: "${tests_path:}/data/targets_test.csv"
+    limit: 100

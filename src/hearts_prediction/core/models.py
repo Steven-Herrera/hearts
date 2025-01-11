@@ -8,7 +8,6 @@ import typing as T
 import pydantic as pdt
 import shap
 from sklearn import compose, pipeline, preprocessing
-
 from xgboost.sklearn import XGBClassifier
 
 from hearts_prediction.core import schemas
@@ -150,9 +149,8 @@ class BaselineSklearnXGBModel(Model):
         transformer = compose.ColumnTransformer(
             [
                 ("categoricals", categoricals_transformer, self._categoricals),
-                ("numericals", numericals_transformer, self._numericals)(
-                    "numerical_binary", "passthrough", self._numerical_binary
-                ),
+                ("numericals", numericals_transformer, self._numericals),
+                ("numerical_binary", "passthrough", self._numerical_binary),
             ],
             remainder="drop",
         )

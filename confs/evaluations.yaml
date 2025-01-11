@@ -1,5 +1,5 @@
 job:
-  KIND: TuningJob
+  KIND: EvaluationsJob
   inputs:
     KIND: CSVReader
     path: data/inputs_train.csv

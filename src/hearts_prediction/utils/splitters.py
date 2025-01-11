@@ -3,11 +3,11 @@
 # %% IMPORTS
 
 import abc
-import typing as T
 
 import numpy as np
 import numpy.typing as npt
 import pydantic as pdt
+import typing_extensions as T
 from sklearn import model_selection
 
 from hearts_prediction.core import schemas
@@ -80,7 +80,7 @@ class TrainTestSplitter(Splitter):
 
     KIND: T.Literal["TrainTestSplitter"] = "TrainTestSplitter"
 
-    shuffle: bool = False  # required (time sensitive)
+    shuffle: bool = True
     test_size: float = 0.2
     random_state: int = 42
 
@@ -97,6 +97,7 @@ class TrainTestSplitter(Splitter):
             shuffle=self.shuffle,
             test_size=self.test_size,
             random_state=self.random_state,
+            stratify=targets,
         )
         yield train_index, test_index
 
@@ -108,3 +109,6 @@ class TrainTestSplitter(Splitter):
         groups: Index | None = None,
     ) -> int:
         return 1
+
+
+SplitterKind = TrainTestSplitter

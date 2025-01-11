@@ -2,12 +2,11 @@
 
 # %% IMPORTS
 
-import typing as T
-
 import pandas as pd
 import pandera as pa
 import pandera.typing as papd
 import pandera.typing.common as padt
+import typing_extensions as T
 
 # %% TYPES
 

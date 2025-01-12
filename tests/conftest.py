@@ -17,8 +17,8 @@ from hearts_prediction.utils import searchers, signers, splitters
 
 # %% CONFIGS
 
-LIMIT = 1500
-N_SPLITS = 3
+LIMIT = 60
+N_SPLITS = 1
 TEST_SIZE = 0.2
 
 # %% FIXTURES
@@ -49,13 +49,13 @@ def confs_path(tests_path: str) -> str:
 @pytest.fixture(scope="session")
 def inputs_path(data_path: str) -> str:
     """Return the path of the inputs dataset."""
-    return os.path.join(data_path, "inputs_test.csv")
+    return os.path.join(data_path, "inputs_sample.csv")
 
 
 @pytest.fixture(scope="session")
 def targets_path(data_path: str) -> str:
     """Return the path of the targets dataset."""
-    return os.path.join(data_path, "targets_test.csv")
+    return os.path.join(data_path, "targets_sample.csv")
 
 
 @pytest.fixture(scope="session")

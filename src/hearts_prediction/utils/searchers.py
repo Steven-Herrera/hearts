@@ -148,7 +148,7 @@ class BayesCVSearcher(Searcher):
             estimator=model,
             scoring=metric.scorer,
             cv=cv,
-            param_grid=self.param_grid,
+            search_spaces=self.param_grid,
             n_jobs=self.n_jobs,
             refit=self.refit,
             verbose=self.verbose,

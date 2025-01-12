@@ -50,7 +50,6 @@ class Schema(pa.DataFrameModel):
 class InputsSchema(Schema):
     """Schema for the project inputs."""
 
-    padt
     Age: papd.Series[padt.UInt64] = pa.Field(ge=0)
     Sex: papd.Series[str] = pa.Field(isin=["M", "F"])
     ChestPainType: papd.Series[str] = pa.Field(isin=["ATA", "NAP", "ASY", "TA"])

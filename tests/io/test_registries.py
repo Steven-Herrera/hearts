@@ -62,6 +62,19 @@ def test_custom_pipeline(
     register = registries.MlflowRegister(tags=tags)
     run_config = mlflow_service.RunConfig(name="Custom-Run")
     # when
+    assert inputs.columns.tolist() == [
+        "Age",
+        "Sex",
+        "ChestPainType",
+        "RestingBP",
+        "Cholesterol",
+        "FastingBS",
+        "RestingECG",
+        "MaxHR",
+        "ExerciseAngina",
+        "Oldpeak",
+        "ST_Slope",
+    ], inputs.columns
     with mlflow_service.run_context(run_config=run_config) as run:
         info = saver.save(model=model, signature=signature, input_example=inputs)
         version = register.register(name=name, model_uri=info.model_uri)

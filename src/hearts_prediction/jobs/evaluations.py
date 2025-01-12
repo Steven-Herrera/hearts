@@ -1,0 +1,142 @@
+"""Define a job for evaluating registered models with data."""
+
+# %% IMPORTS
+
+import mlflow
+import pandas as pd
+import pydantic as pdt
+import typing_extensions as T
+
+from hearts_prediction.core import metrics as metrics_
+from hearts_prediction.core import schemas
+from hearts_prediction.io import datasets, registries, services
+from hearts_prediction.jobs import base
+
+# %% JOBS
+
+
+class EvaluationsJob(base.Job):
+    """Generate evaluations from a registered model and a dataset.
+
+    Parameters:
+        run_config (services.MlflowService.RunConfig): mlflow run config.
+        inputs (datasets.ReaderKind): reader for the inputs data.
+        targets (datasets.ReaderKind): reader for the targets data.
+        model_type (str): model type (e.g. "regressor", "classifier").
+        alias_or_version (str | int): alias or version for the  model.
+        metrics (metrics_.MetricsKind): metric list to compute.
+        evaluators (list[str]): list of evaluators to use.
+        thresholds (dict[str, metrics_.Threshold] | None): metric thresholds.
+    """
+
+    KIND: T.Literal["EvaluationsJob"] = "EvaluationsJob"
+
+    # Run
+    run_config: services.MlflowService.RunConfig = services.MlflowService.RunConfig(
+        name="Evaluations"
+    )
+    # Data
+    inputs: datasets.ReaderKind = pdt.Field(..., discriminator="KIND")
+    targets: datasets.ReaderKind = pdt.Field(..., discriminator="KIND")
+    # Model
+    model_type: str = "classifier"
+    alias_or_version: str | int = "Champion"
+    # Loader
+    loader: registries.LoaderKind = pdt.Field(registries.CustomLoader(), discriminator="KIND")
+    # Metrics
+    metrics: metrics_.MetricsKind = [
+        metrics_.SklearnMetric(name="f1_score", kwargs={"average": "weighted"})
+    ]
+    # Evaluators
+    evaluators: list[str] = ["default"]
+    # Thresholds
+    thresholds: dict[str, metrics_.Threshold] = {
+        "f1_score_weighted": metrics_.Threshold(threshold=0.5, greater_is_better=True)
+    }
+
+    @T.override
+    def run(self) -> base.Locals:
+        # services
+        # - logger
+        logger = self.logger_service.logger()
+        logger.info("With logger: {}", logger)
+        # - mlflow
+        client = self.mlflow_service.client()
+        logger.info("With client: {}", client.tracking_uri)
+        with self.mlflow_service.run_context(run_config=self.run_config) as run:
+            logger.info("With run context: {}", run.info)
+            # data
+            # - inputs
+            logger.info("Read inputs: {}", self.inputs)
+            inputs_ = self.inputs.read()  # unchecked!
+            inputs = schemas.InputsSchema.check(inputs_)
+            logger.debug("- Inputs shape: {}", inputs.shape)
+            # - targets
+            logger.info("Read targets: {}", self.targets)
+            targets_ = self.targets.read()  # unchecked!
+            targets = schemas.TargetsSchema.check(targets_)
+            logger.debug("- Targets shape: {}", targets.shape)
+            # lineage
+            # - inputs
+            logger.info("Log lineage: inputs")
+            inputs_lineage = self.inputs.lineage(data=inputs, name="inputs")
+            mlflow.log_input(dataset=inputs_lineage, context=self.run_config.name)
+            logger.debug("- Inputs lineage: {}", inputs_lineage.to_dict())
+            # - targets
+            logger.info("Log lineage: targets")
+            targets_lineage = self.targets.lineage(
+                data=targets, name="targets", targets=schemas.TargetsSchema.HeartDisease
+            )
+            mlflow.log_input(dataset=targets_lineage, context=self.run_config.name)
+            logger.debug("- Targets lineage: {}", targets_lineage.to_dict())
+            # model
+            logger.info("With model: {}", self.mlflow_service.registry_name)
+            model_uri = registries.uri_for_model_alias_or_version(
+                name=self.mlflow_service.registry_name,
+                alias_or_version=self.alias_or_version,
+            )
+            logger.debug("- Model URI: {}", model_uri)
+            # loader
+            logger.info("Load model: {}", self.loader)
+            model = self.loader.load(uri=model_uri)
+            logger.debug("- Model: {}", model)
+            # outputs
+            logger.info("Predict outputs: {}", len(inputs))
+            outputs = model.predict(inputs=inputs)  # checked
+            logger.debug("- Outputs shape: {}", outputs.shape)
+            # dataset
+            logger.info("Create dataset: inputs & targets & outputs")
+            dataset_ = pd.concat([inputs, targets, outputs], axis="columns")
+            dataset = mlflow.data.from_pandas(  # type: ignore[attr-defined]
+                df=dataset_,
+                name="evaluation",
+                targets=schemas.TargetsSchema.HeartDisease,
+                predictions=schemas.OutputsSchema.prediction,
+            )
+            logger.debug("- Dataset: {}", dataset.to_dict())
+            # metrics
+            logger.debug("Convert metrics: {}", self.metrics)
+            extra_metrics = [metric.to_mlflow() for metric in self.metrics]
+            logger.debug("- Extra metrics: {}", extra_metrics)
+            # thresholds
+            logger.info("Convert thresholds: {}", self.thresholds)
+            validation_thresholds = {
+                name: threshold.to_mlflow() for name, threshold in self.thresholds.items()
+            }
+            logger.debug("- Validation thresholds: {}", validation_thresholds)
+            # evaluations
+            logger.info("Compute evaluations: {}", self.model_type)
+            evaluations = mlflow.evaluate(
+                data=dataset,
+                model_type=self.model_type,
+                evaluators=self.evaluators,
+                extra_metrics=extra_metrics,
+                validation_thresholds=validation_thresholds,
+            )
+            logger.debug("- Evaluations metrics: {}", evaluations.metrics)
+            # notify
+            self.alerts_service.notify(
+                title="Evaluations Job Finished",
+                message=f"Evaluation metrics: {evaluations.metrics}",
+            )
+        return locals()
